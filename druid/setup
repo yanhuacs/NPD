@@ -1,0 +1,10 @@
+#!/bin/bash
+
+chmod +x druid.py
+chmod +x runtests
+chmod +x bin/Launcher
+
+export DRUID_HOME=`pwd`
+export PATH=$DRUID_HOME:$PATH
+
+ant

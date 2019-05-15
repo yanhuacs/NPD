@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="jar" name="Druid Build File">
+
+    <property environment="env"/>
+
+	<!-- setup the classpath -->
+	<path id="classpath">
+		<fileset dir="lib">
+			<include name="commons-cli-1.2.jar"/>
+			<include name="commons-io-2.4.jar"/>
+			<include name="soot-trunk.jar"/>
+			<include name="string.jar"/>
+			<include name="automaton.jar"/>
+			<include name="gson-2.7.jar"/>
+			<include name="junit.jar"/>
+		</fileset>
+	</path>
+
+    <target name="compile">
+		<mkdir dir="classes"/>
+		<javac srcdir="src" destdir="classes" debug="true" includeantruntime="false">
+			<classpath refid="classpath"/>
+		</javac>
+    </target>
+	
+	<target name="jar" depends="compile,tests" description="Build the complete jar file that includes all required libraries.">
+		<jar destfile="druid.jar" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="driver.Main"/>
+                <attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="config-files"/>
+			<fileset dir="classes"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/gson-2.7.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/automaton.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/string.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/soot-trunk.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/commons-io-2.4.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/commons-cli-1.2.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/junit.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/axml-2.0.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="aafe/soot-infoflow.jar"/>
+			<zipfileset excludes="META-INF/*.*" src="aafe/soot-infoflow-android.jar"/>
+        </jar>
+    </target>
+	
+	<target name="tests">
+        <mkdir dir="testclasses"/>
+        <javac
+        	source="1.8"
+        	target="1.8"
+            srcdir="tests"
+            destdir="testclasses"
+            debug="true"
+			includeantruntime="false">
+        	<classpath>
+				<pathelement location="classes"/>
+				<pathelement location="lib/commons-cli-1.2.jar"/>
+				<pathelement location="lib/commons-io-2.4.jar"/>
+				<pathelement location="lib/soot-trunk.jar"/>
+				<pathelement location="lib/string.jar"/>
+				<pathelement location="lib/automaton.jar"/>
+				<pathelement location="lib/gson-2.7.jar"/>
+				<pathelement location="lib/junit.jar"/>
+				<pathelement location="lib/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+			</classpath>
+        </javac>
+    </target>
+	
+	<target name="clean">
+		<delete dir="classes"/>
+		<delete dir="testclasses"/>
+	</target>
+
+</project>

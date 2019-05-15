@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="compile" name="Druid_EX Build File">
+
+    <property environment="env"/>
+
+	<!-- setup the classpath -->
+	<path id="classpath">
+		<fileset dir="lib">
+			<include name="druid.jar"/>
+		</fileset>
+	</path>
+
+    <target name="compile">
+		<mkdir dir="classes"/>
+		<javac srcdir="src" destdir="classes" debug="true" includeantruntime="false">
+			<classpath refid="classpath"/>
+		</javac>
+    </target>
+	
+	<target name="druid" depends="compile" description="Build the complete jar file that includes all required libraries.">
+		<ant antfile="build.xml"
+              dir="druid"
+              inheritall="false"
+              target="jar"
+        />
+		<move file="druid/druid.jar"
+			tofile="lib/druid.jar"
+		/>
+    </target>
+	
+	<target name="clean">
+		<delete dir="classes"/>
+	</target>
+
+</project>

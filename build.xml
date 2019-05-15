@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="npda" name="Druid Build File">
+
+    <property environment="env"/>
+	<property name="test.src.dir" value="npdv/src/test"/>
+	<path id="test.path">
+		<pathelement location="npda.jar"/>
+		<pathelement location="druid/lib/junit.jar"/>
+		<pathelement location="druid/lib/harmcrest-core-1.3.0.jar"/>
+	</path>
+
+	<target name="druid" description="Build the complete jar file that includes all required libraries.">
+		<ant antfile="build.xml"
+			 dir="druid"
+			 inheritall="false"
+			 target="jar"
+		/>
+		<move file="druid/druid.jar"
+			  tofile="lib/druid.jar"
+		/>
+		<available file="lib/druid.jar" property="druid.present"/>
+	</target>
+
+	<path id="classpath">
+		<fileset dir="lib">
+			<include name="druid.jar"/>
+		</fileset>
+	</path>
+
+	<!--<target name="npda_compile">-->
+	<target name="npda_compile" depends="druid">
+		<mkdir dir="classes/npda"/>
+		<javac srcdir="npdv/src" destdir="classes/npda" debug="true" includeantruntime="false">
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+
+	<target name="npda" depends="npda_compile" description="Build Null Pointer Dereference Analysis">
+		<jar destfile="npda.jar" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="core.NPVDriver"/>
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="classes/npda"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/druid.jar"/>
+		</jar>
+	</target>
+
+	<target name="test" depends="npda">
+		<junit printsummary="on" haltonfailure="false" fork="true" showoutput="true" haltonerror="false">
+            <classpath refid="test.path"/>
+			<!--<formatter type="plain" usefile="false"/>-->
+            <test name="test.TestcaseVerify"/>
+		</junit>
+
+	</target>
+
+	<!--
+	<target name="npda_compile" depends="druid">
+		<mkdir dir="classes/npda"/>
+		<javac srcdir="npda/src" destdir="classes/npda" debug="true" includeantruntime="false">
+			<classpath refid="classpath"/>
+		</javac>
+
+	</target>
+	<target name="npda" depends="npda_compile" description="Build Null Pointer Dereference Analysis">
+		<jar destfile="npda.jar" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="Run"/>
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="classes/npda"/>
+			<zipfileset excludes="META-INF/*.*" src="lib/druid.jar"/>
+		</jar>
+	</target>
+	-->
+	
+	<target name="clean">
+		<delete dir="classes"/>
+		<delete file="npdv.jar"/>
+		<delete file="npda.jar"/>
+		<ant antfile="build.xml"
+			 dir="druid"
+			 inheritall="false"
+			 target="clean"
+		/>
+	</target>
+
+</project>
